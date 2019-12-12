@@ -9,6 +9,7 @@ import by.sam_solutions.findtrip.repository.CountryRepository;
 import by.sam_solutions.findtrip.repository.entity.CityEntity;
 import by.sam_solutions.findtrip.repository.entity.CountryEntity;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.annotation.ReadOnlyProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,7 +26,7 @@ public class CityServiceImpl implements CityService {
     @Autowired
     CountryRepository countryRepository;
 
-    @Transactional
+
     @Override
     public CityDTO findOne(Long id) {
         Optional<CityEntity> cityEntity=  cityRepository.findById(id);
@@ -49,7 +50,6 @@ public class CityServiceImpl implements CityService {
         cityRepository.deleteById(id);
     }
 
-    @Transactional
     @Override
     public Long getCityIdByName(String name) {
 
@@ -90,6 +90,11 @@ public class CityServiceImpl implements CityService {
                 .map(c -> new CityDTO(c.getId(), c.getName(),c.getCountryEntity().getId(),c.getCountryEntity().getName()))
                 .collect(Collectors.toList());
         return cityDTOs;
+    }
+
+    @Override
+    public Long getCountryIdByCityId(Long id) {
+     return    cityRepository.getIdCountryByCityId(id);
     }
 
 }
