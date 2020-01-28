@@ -19,18 +19,19 @@ import java.util.Optional;
 @RequestMapping("/planes")
 public class PlaneController {
 
-    @Autowired
-    PlaneService planeService;
+    private PlaneService planeService;
+    private CompanyService companyService;
 
     @Autowired
-    CompanyService companyService;
-
+    public PlaneController(PlaneService planeService, CompanyService companyService) {
+        this.planeService = planeService;
+        this.companyService = companyService;
+    }
 
     @GetMapping(path = {"/edit", "/edit/{id}"})
-    public String getAddOrEditCityView(
-            Model model,
-            @RequestParam(name = "company", required = false) String company,
-            @PathVariable(value = "id") Optional<Long> id) throws EntityNotFoundException {
+    public String getAddOrEditPlaneView(Model model,
+                                        @RequestParam(name = "company", required = false) String company,
+                                        @PathVariable(value = "id") Optional<Long> id) {
 
         if (id.isPresent()) {
             PlaneDTO planeDTO = planeService.findOne(id.get());
@@ -51,17 +52,17 @@ public class PlaneController {
     }
 
     @GetMapping("/delete/{id}")
-    public String deleteCountry(@PathVariable(value = "id") Long id) {
+    public String deletePlane(@PathVariable(value = "id") Long id) {
         Long idCompany = planeService.getCompanyIdByPlaneId(id);
         planeService.deleteById(id);
-        return idCompany==null ? "redirect:/companies" : "redirect:/companies/"+idCompany+"/planes";
+        return idCompany == null ? "redirect:/companies" : "redirect:/companies/" + idCompany + "/planes";
     }
 
 
     @PostMapping(path = "/edit")
-    public String addOrEditCountry(@Valid @ModelAttribute("plane") PlaneDTO planeDTO,
-                                   @RequestParam("companyName") String companyName,
-                                   BindingResult result, Model model) {
+    public String addOrEditPlane(@Valid @ModelAttribute("plane") PlaneDTO planeDTO,
+                                 @RequestParam("companyName") String companyName,
+                                 BindingResult result, Model model) {
         Long companyId = companyService.getCompanyIdByName(companyName);
         if (result.hasErrors()) {
             ApiError apiError = new ApiError();
@@ -80,7 +81,7 @@ public class PlaneController {
         planeService.saveOrUpdate(planeDTO, companyId, companyName);
 
 
-        return "redirect:/companies/"+companyId+"/planes";
+        return "redirect:/companies/" + companyId + "/planes";
     }
 
 

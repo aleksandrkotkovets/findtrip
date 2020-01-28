@@ -7,9 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.Optional;
 import java.util.Set;
 
-
 public interface PlaneRepository extends JpaRepository<PlaneEntity, Long> {
-
 
     Optional<PlaneEntity> findById(Long id);
 
@@ -19,13 +17,11 @@ public interface PlaneRepository extends JpaRepository<PlaneEntity, Long> {
 
     void delete(PlaneEntity plainEntity);
 
-   void deleteById(Long id);
+    void deleteById(Long id);
 
-
-
-    @Query(value = "select t.id  from transport t where t.side_number=?1", nativeQuery = true)
+    @Query(value = "select p.id  from PlaneEntity p where p.sideNumber=?1")
     Long findIdBySideNumber(String sideNumber);
 
-    @Query(value = "select t.company_id from transport t where t.id=?1",nativeQuery = true)
+    @Query(value = "select p.company.id from PlaneEntity p where p.id=?1")
     Long getCompanyIdByPlaneId(Long id);
 }

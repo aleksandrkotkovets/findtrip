@@ -17,24 +17,22 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class PlaneServiceImpl  implements PlaneService {
+public class PlaneServiceImpl implements PlaneService {
+
+    private PlaneRepository planeRepository;
+    private CompanyRepository companyRepository;
 
     @Autowired
-    PlaneRepository planeRepository;
+    public PlaneServiceImpl(PlaneRepository planeRepository, CompanyRepository companyRepository) {
+        this.planeRepository = planeRepository;
+        this.companyRepository = companyRepository;
+    }
 
-    @Autowired
-    CompanyRepository companyRepository;
-
-
+    @Transactional
     @Override
     public PlaneEntity add(PlaneEntity plain) {
         PlaneEntity savedPlain = planeRepository.save(plain);
         return savedPlain;
-    }
-
-    @Override
-    public PlaneEntity update(PlaneEntity plain) {
-        return null;
     }
 
     @Override
@@ -43,19 +41,16 @@ public class PlaneServiceImpl  implements PlaneService {
     }
 
 
-
     @Override
     public PlaneEntity findById() {
         return null;
     }
 
-
-    @Transactional
     @Override
     public PlaneDTO findOne(Long id) {
-        Optional<PlaneEntity> planeEntity =  planeRepository.findById(id);
+        Optional<PlaneEntity> planeEntity = planeRepository.findById(id);
 
-        if(planeEntity.isPresent()){
+        if (planeEntity.isPresent()) {
             PlaneDTO planeDTO = new PlaneDTO();
             planeDTO.setId(planeEntity.get().getId());
             planeDTO.setName(planeEntity.get().getName());
@@ -67,24 +62,26 @@ public class PlaneServiceImpl  implements PlaneService {
             planeDTO.setCompanyDTO(companyDTO);
 
             return planeDTO;
-        }else {
+        } else {
             return null;
         }
     }
 
+    @Transactional
     @Override
     public void deleteById(Long id) {
         planeRepository.deleteById(id);
     }
 
+    @Transactional
     @Override
-    public void saveOrUpdate(PlaneDTO planeDTO, Long companyId, String  companyName) {
+    public void saveOrUpdate(PlaneDTO planeDTO, Long companyId, String companyName) {
 
         Long idExistPlane = this.getPlaneIdBySideNumber(planeDTO.getSideNumber());
-        String firstLetterСompName = companyName.substring(0,1);
-        String firstLetterSideNumber = planeDTO.getSideNumber().substring(0,1);
+        String firstLetterСompName = companyName.substring(0, 1);
+        String firstLetterSideNumber = planeDTO.getSideNumber().substring(0, 1);
 
-        if(!firstLetterСompName.equals(firstLetterSideNumber)) {
+        if (!firstLetterСompName.equals(firstLetterSideNumber)) {
             throw new EditPlaneParametersExistException(
                     "The_first_letter_of_the_tail_number_must_match_the_name_of_the_company",
                     planeDTO, companyName, companyId);
@@ -93,7 +90,7 @@ public class PlaneServiceImpl  implements PlaneService {
         if (planeDTO.getId() != null) {
 
             PlaneEntity planeEntityEdit = planeRepository.findById(planeDTO.getId()).get();
-            if(planeEntityEdit != null) {
+            if (planeEntityEdit != null) {
                 if (idExistPlane != null && idExistPlane != planeDTO.getId()) {
                     throw new EditPlaneParametersExistException(
                             "Plane_with_this_side_number_already_exist", planeDTO, companyName, companyId);
@@ -101,28 +98,28 @@ public class PlaneServiceImpl  implements PlaneService {
                 planeEntityEdit.setName(planeDTO.getName());
                 planeEntityEdit.setSideNumber(planeDTO.getSideNumber());
                 planeRepository.save(planeEntityEdit);
-            }else {
-                throw new EntityNotFoundException("Plane with id="+planeDTO.getId()+" not found");
+            } else {
+                throw new EntityNotFoundException("Plane with id=" + planeDTO.getId() + " not found");
             }
 
         } else {
             if (idExistPlane != null && idExistPlane != planeDTO.getId()) {
                 throw new EditPlaneParametersExistException(
-                        "Plane_with_this_side_number_already_exist",planeDTO,companyName,companyId );
+                        "Plane_with_this_side_number_already_exist", planeDTO, companyName, companyId);
             }
             PlaneEntity planeEntity = new PlaneEntity(
-                    planeDTO.getName(),planeDTO.getSideNumber(), companyRepository.findByName(companyName));
+                    planeDTO.getName(), planeDTO.getSideNumber(), companyRepository.findByName(companyName));
             planeRepository.save(planeEntity);
         }
     }
 
     @Override
     public Long getCompanyIdByPlaneId(Long id) {
-       return planeRepository.getCompanyIdByPlaneId(id);
+        return planeRepository.getCompanyIdByPlaneId(id);
     }
 
     @Override
     public Long getPlaneIdBySideNumber(String sideNumber) {
-       return planeRepository.findIdBySideNumber(sideNumber);
+        return planeRepository.findIdBySideNumber(sideNumber);
     }
 }

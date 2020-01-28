@@ -17,11 +17,11 @@
 <!--/*@thymesVar id="user" type="by.sam_solutions.findtrip.controller.dto.UserDTO"*/-->
 <!--/*@thymesVar id="apiError" type="by.sam_solutions.findtrip.exception.UserControllerHandler"*/-->
 <div th:replace="header :: header"/>
-<div class="container my-5">
+<div class="container my-5" style="width: 60vh">
     <h3 th:text="#{text.registration}"></h3>
     <div class="card">
         <div class="card-body">
-            <div class="col-md-10">
+            <div style="width: 80vh">
                 <form data-th-action="@{/registration}" data-th-object="${user}" method="post">
 
                     <div th:if="${#fields.hasErrors()}">
@@ -44,7 +44,7 @@
 
                         <div class="form-group col-md-8">
                             <label for="password" class="col-form-label" th:text="#{text.password}"></label>
-                            <input type="text" th:value="${user?.password}" th:name="password" class="form-control"
+                            <input type="password" th:value="${user?.password}" th:name="password" class="form-control"
                                    id="password" th:placeholder="#{text.password}" autofocus required minlength="8"
                                    maxlength="14"/>
                             <span class="form__error" th:text="#{text.error.password}"></span>
@@ -61,7 +61,7 @@
                             <label for="firstName" class="col-form-label" th:text="#{text.firstName}"></label>
                             <input type="text" th:value="${user?.firstName}" th:name="firstName" class="form-control"
                                    id="firstName" th:placeholder="#{text.firstName}" autofocus required
-                                   pattern="[A-Z]([a-z-']{2,13})" minlength="3" maxlength="14"/>
+                                   pattern="[A-ZА-ЯЁ]([A-Za-zА-Яа-яЁё]{2,13})" minlength="3" maxlength="14"/>
                             <span class="form__error" th:text="#{text.error.firstName}"></span>
                         </div>
 
@@ -69,7 +69,7 @@
                             <label for="lastName" class="col-form-label" th:text="#{text.lastName}"></label>
                             <input type="text" th:value="${user?.lastName}" th:name="lastName" class="form-control"
                                    id="lastName" th:placeholder="#{text.lastName}" autofocus required
-                                   pattern="[A-Z]([a-z-']{2,13})" minlength="3" maxlength="14"/>
+                                   pattern="[A-ZА-ЯЁ]([A-Za-zА-Яа-яЁё]{2,13})" minlength="3" maxlength="14"/>
                             <span class="form__error" th:text="#{text.error.lastName}"></span>
                         </div>
 
@@ -77,7 +77,7 @@
                             <label for="patronymic" class="col-form-label" th:text="#{text.patronymic}"></label>
                             <input type="text" th:value="${user?.patronymic}" th:name="patronymic" class="form-control"
                                    id="patronymic" th:placeholder="#{text.patronymic}" autofocus required
-                                   pattern="[A-Z]([a-z-']{2,13})" minlength="3" maxlength="14"/>
+                                   pattern="[A-ZА-ЯЁ]([A-Za-zА-Яа-яЁё]{2,13})" minlength="3" maxlength="14"/>
                             <span class="form__error" th:text="#{text.error.patronymic}"></span>
                         </div>
 
@@ -106,6 +106,6 @@
         </div>
     </div>
 </div>
-<div th:replace="footer :: footer"/>
+
 </body>
 </html>

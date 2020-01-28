@@ -2,42 +2,46 @@ package by.sam_solutions.findtrip.controller;
 
 import by.sam_solutions.findtrip.controller.dto.AirportDTO;
 import by.sam_solutions.findtrip.controller.dto.CityDTO;
-import by.sam_solutions.findtrip.controller.dto.CountryDTO;
+import by.sam_solutions.findtrip.service.AirportService;
 import by.sam_solutions.findtrip.service.CityService;
 import by.sam_solutions.findtrip.service.CountryService;
-import by.sam_solutions.findtrip.service.AirportService;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @Controller
 @RequestMapping("/airports")
 public class AirportController {
+    private final static Logger LOGGER = LogManager.getLogger();
+
+    private AirportService airportService;
+    private CountryService countryService;
+    private CityService cityService;
 
     @Autowired
-    AirportService airportService;
-
-    @Autowired
-    CountryService countryService;
-
-    @Autowired
-    CityService cityService;
+    public AirportController(AirportService airportService, CountryService countryService, CityService cityService) {
+        this.airportService = airportService;
+        this.countryService = countryService;
+        this.cityService = cityService;
+    }
 
     @GetMapping
-    public String getShowAirportsView(Model model){
-        List<AirportDTO> airportDTOs  = airportService.findAll();
-        model.addAttribute("airports", airportDTOs.size() == 0 ? null: airportDTOs);
+    public String getShowAirportsView(Model model) {
+        LOGGER.info("Get showAirportsView: airport/showAirports.html");
+        List<AirportDTO> airportDTOs = airportService.findAll();
+        model.addAttribute("airports", airportDTOs.size() == 0 ? null : airportDTOs);
         return "airport/showAirports";
     }
 
     @GetMapping("/edit/{id}")
-    public String getEditAirportView(@PathVariable Long id, Model model){
+    public String getEditAirportView(@PathVariable Long id, Model model) {
+        LOGGER.info("Get editAirportView: airport/editAirport");
         AirportDTO airportDTO = airportService.findById(id);
         model.addAttribute("airport", airportDTO);
         return "airport/editAirport";
@@ -46,44 +50,42 @@ public class AirportController {
     @PostMapping("/edit")
     public String editAirport(@RequestParam Long id,
                               @RequestParam String name,
-                              @RequestParam String code){
-
-        AirportDTO airportDTO = new AirportDTO();
-        airportDTO.setId(id);
-        airportDTO.setName(name);
-        airportDTO.setCode(code);
-
-        airportService.updateAirport(airportDTO);
+                              @RequestParam String code) {
+        LOGGER.info("Update airport where id: " + id + ", new name: " + name + ", new code: " + code);
+        airportService.updateAirport(new AirportDTO(id, name, code));
         return "redirect:/airports";
     }
 
     @GetMapping("/delete/{id}")
-    public String deleteAirport(@PathVariable Long id){
+    public String deleteAirport(@PathVariable Long id) {
+        LOGGER.info("Delete airport where id: " + id);
         airportService.delete(id);
         return "redirect:/airports";
     }
 
     @GetMapping("/add")
-    public String getAddAirportView(Model model){
-        List<CountryDTO> countryDTOS = countryService.findAll();
-        model.addAttribute("countries", countryDTOS);
+    public String getAddAirportView(Model model) {
+        LOGGER.info("Get addAirport: airport/addAirport");
+        model.addAttribute("countries", countryService.findAll());
         model.addAttribute("cities", new ArrayList<CityDTO>());
+
         return "airport/addAirport";
     }
 
-    @PostMapping(value = "/add/getCities")
+
+    @GetMapping(value = "/countries/{id}")
     @ResponseBody
-    public List<CityDTO> getCities(@RequestBody CountryDTO obj, Model model) {
-        List<CityDTO> list = cityService.getCityListByCountry(obj.getId());
-        return list;
+    public List<CityDTO> getCities(@PathVariable Long id) {
+        LOGGER.info("Get cities where country id: " + id);
+        return cityService.getCityListByCountry(id);
     }
 
     @PostMapping("/add")
     public String addAirport(@RequestParam String name,
                              @RequestParam String code,
-                             @RequestParam Long idCity){
-        AirportDTO airportDTO = new AirportDTO(name, code, idCity);
-        airportService.save(airportDTO);
+                             @RequestParam Long idCity) {
+        LOGGER.info("Add airport with name: " + name + ", code: " + code + ", idCity: " + idCity);
+        airportService.save(new AirportDTO(name, code, idCity));
         return "redirect:/airports";
     }
 

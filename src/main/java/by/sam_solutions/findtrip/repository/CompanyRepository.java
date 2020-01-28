@@ -2,13 +2,15 @@ package by.sam_solutions.findtrip.repository;
 
 import by.sam_solutions.findtrip.repository.entity.CompanyEntity;
 import by.sam_solutions.findtrip.repository.entity.Rating;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-
 
 public interface CompanyRepository extends JpaRepository<CompanyEntity, Long> {
 
@@ -26,6 +28,12 @@ public interface CompanyRepository extends JpaRepository<CompanyEntity, Long> {
 
     void deleteById(Long id);
 
-    @Query(value = "SELECT comp.id FROM company comp WHERE comp.name = ?1",nativeQuery = true)
+    @Query("SELECT comp.id FROM CompanyEntity comp WHERE comp.name = ?1")
     Long getCompanyIdByName(String name);
+
+    @Query("select comp from CompanyEntity comp order by comp.name asc")
+    List<CompanyEntity> findAllAndOrderByName();
+
+    @Query("select company from CompanyEntity company where LOWER(company.name) like  %?#{[0].toLowerCase()}% ")
+    Page<CompanyEntity> findAllByNameIgnoreCase(String name, Pageable pageable);
 }

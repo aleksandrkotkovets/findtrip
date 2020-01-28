@@ -27,6 +27,16 @@ public class CompanyDTO {
         this.rating = rating;
     }
 
+    public CompanyDTO(Long id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
+    public CompanyDTO(String name, Rating rating) {
+        this.name = name;
+        this.rating = rating;
+    }
+
 
     public String getName() {
         return name;
@@ -58,5 +68,15 @@ public class CompanyDTO {
 
     public void setPlaneDTOList(List<PlaneDTO> planeDTOList) {
         this.planeDTOList = planeDTOList;
+    }
+
+    @Override
+    public String toString() {
+        return "CompanyDTO{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", rating=" + rating +
+                ", planeDTOList=" + planeDTOList +
+                '}';
     }
 }

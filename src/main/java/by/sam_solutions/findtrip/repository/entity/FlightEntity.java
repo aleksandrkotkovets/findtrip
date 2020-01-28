@@ -1,18 +1,12 @@
 package by.sam_solutions.findtrip.repository.entity;
 
 
-
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-
-import java.sql.Time;
 import java.sql.Timestamp;
-import java.util.Date;
 import java.util.Set;
 
-import static java.util.Objects.hash;
 import static javax.persistence.CascadeType.ALL;
-
 
 
 @Entity
@@ -29,7 +23,7 @@ public class FlightEntity extends BaseEntity {
 
     @NotNull
     @Column(name = "price")
-    private Integer price;
+    private Double price;
 
     @NotNull
     @Column(name = "departure_date", columnDefinition = "timestamp")
@@ -40,9 +34,9 @@ public class FlightEntity extends BaseEntity {
     private Timestamp arrivalDate;
 
     @OneToMany(mappedBy = "flight")
-    private Set<TicketEntity> tickets;
+    private Set<OrderEntity> orders;
 
-    @ManyToOne(optional = false, cascade = ALL , fetch = FetchType.LAZY)
+    @ManyToOne(optional = false, cascade = ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "plane_id")
     @NotNull
     private PlaneEntity plane;
@@ -56,6 +50,10 @@ public class FlightEntity extends BaseEntity {
     @JoinColumn(name = "airport_arrival_id")
     @NotNull
     private AirportEntity airportArrival;
+
+    @Column(name = "status", length = 8)
+    @Enumerated(EnumType.STRING)
+    private FlightStatus status;
 
     public FlightEntity() {
     }
@@ -76,15 +74,15 @@ public class FlightEntity extends BaseEntity {
         this.allSeats = allSeats;
     }
 
-    public Integer getPrice() {
+    public Double getPrice() {
         return price;
     }
 
-    public void setPrice(Integer price) {
+    public void setPrice(Double price) {
         this.price = price;
     }
 
-    public @NotNull Date getDepartureDate() {
+    public Timestamp getDepartureDate() {
         return departureDate;
     }
 
@@ -92,7 +90,7 @@ public class FlightEntity extends BaseEntity {
         this.departureDate = departureDate;
     }
 
-    public @NotNull Date getArrivalDate() {
+    public Timestamp getArrivalDate() {
         return arrivalDate;
     }
 
@@ -100,19 +98,19 @@ public class FlightEntity extends BaseEntity {
         this.arrivalDate = arrivalDate;
     }
 
-    public Set<TicketEntity> getTickets() {
-        return tickets;
+    public Set<OrderEntity> getOrders() {
+        return orders;
     }
 
-    public void setTickets(Set<TicketEntity> tickets) {
-        this.tickets = tickets;
+    public void setOrders(Set<OrderEntity> orders) {
+        this.orders = orders;
     }
 
     public PlaneEntity getPlane() {
         return plane;
     }
 
-    public void setPlane(PlaneEntity plain) {
+    public void setPlane(PlaneEntity plane) {
         this.plane = plane;
     }
 
@@ -130,6 +128,14 @@ public class FlightEntity extends BaseEntity {
 
     public void setAirportArrival(AirportEntity airportArrival) {
         this.airportArrival = airportArrival;
+    }
+
+    public FlightStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(FlightStatus status) {
+        this.status = status;
     }
 
 

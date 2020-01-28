@@ -7,7 +7,7 @@ import java.util.Objects;
 import java.util.Set;
 
 @Entity
-@Table(name = "transport")
+@Table(name = "plane")
 public class PlaneEntity extends BaseEntity{
 
     @NotNull
@@ -36,7 +36,10 @@ public class PlaneEntity extends BaseEntity{
         this.company = companyEntity;
     }
 
-
+    public PlaneEntity(@NotNull String name, @NotNull String sideNumber) {
+        this.name = name;
+        this.sideNumber = sideNumber;
+    }
 
     public String getName() {
         return name;

@@ -8,9 +8,7 @@ import java.util.Optional;
 
 public interface UserService {
 
-    UserEntity save(UserDTO userDTO, String role);
-
-    Long getUserByCriteria(String email, String login, String phoneNumber);
+    boolean save(UserDTO userDTO, String role);
 
     List<UserDTO> getUsersByRole(String role);
 
@@ -19,7 +17,6 @@ public interface UserService {
     UserDTO findUserById(Long id);
 
     void update(UserDTO user);
-
 
     Optional<UserEntity> findByLogin(String login);
 }

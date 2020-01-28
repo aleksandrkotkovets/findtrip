@@ -1,6 +1,6 @@
 package by.sam_solutions.findtrip.service.impl;
 
-import by.sam_solutions.findtrip.service.CityService;
+import by.sam_solutions.findtrip.controller.dto.AirportDTO;
 import by.sam_solutions.findtrip.controller.dto.CityDTO;
 import by.sam_solutions.findtrip.controller.dto.CountryDTO;
 import by.sam_solutions.findtrip.exception.UserNotFoundException;
@@ -8,8 +8,8 @@ import by.sam_solutions.findtrip.repository.CityRepository;
 import by.sam_solutions.findtrip.repository.CountryRepository;
 import by.sam_solutions.findtrip.repository.entity.CityEntity;
 import by.sam_solutions.findtrip.repository.entity.CountryEntity;
+import by.sam_solutions.findtrip.service.CityService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.annotation.ReadOnlyProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,17 +20,19 @@ import java.util.stream.Collectors;
 @Service
 public class CityServiceImpl implements CityService {
 
-    @Autowired
-    CityRepository cityRepository;
+    private CityRepository cityRepository;
+    private CountryRepository countryRepository;
 
     @Autowired
-    CountryRepository countryRepository;
-
+    public CityServiceImpl(CityRepository cityRepository, CountryRepository countryRepository) {
+        this.cityRepository = cityRepository;
+        this.countryRepository = countryRepository;
+    }
 
     @Override
     public CityDTO findOne(Long id) {
-        Optional<CityEntity> cityEntity=  cityRepository.findById(id);
-        if(cityEntity.isPresent()){
+        Optional<CityEntity> cityEntity = cityRepository.findById(id);
+        if (cityEntity.isPresent()) {
             CityDTO cityDTO = new CityDTO();
             cityDTO.setName(cityEntity.get().getName());
             cityDTO.setId(cityEntity.get().getId());
@@ -39,12 +41,20 @@ public class CityServiceImpl implements CityService {
             countryDTO.setName(cityEntity.get().getCountryEntity().getName());
             countryDTO.setId(cityEntity.get().getCountryEntity().getId());
             cityDTO.setCountryDTO(countryDTO);
+
+            List<AirportDTO> airportDTOList = cityEntity
+                    .get().getAirports().stream()
+                    .map(a -> new AirportDTO(a.getId(), a.getName(), a.getCode()))
+                    .collect(Collectors.toList());
+
+            cityDTO.setAirportDTOList(airportDTOList);
             return cityDTO;
-        }else {
+        } else {
             return null;
         }
     }
 
+    @Transactional
     @Override
     public void delete(Long id) {
         cityRepository.deleteById(id);
@@ -52,7 +62,6 @@ public class CityServiceImpl implements CityService {
 
     @Override
     public Long getCityIdByName(String name) {
-
         return cityRepository.getIdExistCityByName(name);
     }
 
@@ -60,8 +69,7 @@ public class CityServiceImpl implements CityService {
     @Override
     public void saveOrUpdate(CityDTO cityDTO, String countryName) {
 
-
-        if(cityDTO.getId() == null){
+        if (cityDTO.getId() == null) {
             CityEntity cityEntity = new CityEntity();
             cityEntity.setId(cityDTO.getId());
             cityEntity.setName(cityDTO.getName());
@@ -70,14 +78,14 @@ public class CityServiceImpl implements CityService {
             cityEntity.setCountryEntity(countryEntity.get());
 
             cityRepository.save(cityEntity);
-        }else {
+        } else {
             CityEntity editCityEntity;
-            if( cityRepository.findById(cityDTO.getId()).isPresent()){
+            if (cityRepository.findById(cityDTO.getId()).isPresent()) {
                 editCityEntity = cityRepository.findById(cityDTO.getId()).get();
                 editCityEntity.setName(cityDTO.getName());
                 cityRepository.save(editCityEntity);
-            }else {
-                throw new UserNotFoundException("City with id="+cityDTO.getId()+" not found");
+            } else {
+                throw new UserNotFoundException("City with id=" + cityDTO.getId() + " not found");
             }
 
         }
@@ -86,15 +94,14 @@ public class CityServiceImpl implements CityService {
     @Override
     public List<CityDTO> getCityListByCountry(Long id) {
         List<CityEntity> cityEntities = cityRepository.findAllByCountryEntity_Id(id);
-        List<CityDTO> cityDTOs = cityEntities.stream()
-                .map(c -> new CityDTO(c.getId(), c.getName(),c.getCountryEntity().getId(),c.getCountryEntity().getName()))
+        return cityEntities.stream()
+                .map(c -> new CityDTO(c.getId(), c.getName(), c.getCountryEntity().getId(), c.getCountryEntity().getName()))
                 .collect(Collectors.toList());
-        return cityDTOs;
     }
 
     @Override
     public Long getCountryIdByCityId(Long id) {
-     return    cityRepository.getIdCountryByCityId(id);
+        return cityRepository.getIdCountryByCityId(id);
     }
 
 }

@@ -7,7 +7,7 @@ server:
 spring:
   jpa:
       database: POSTGRESQL
-      show-sql: true
+      show-sql: false
       hibernate:
         ddl-auto: none
         #create-drop
@@ -30,6 +30,7 @@ spring:
 
 ---
 #Log4j
+
 logging:
   file:
     name: src/main/resources/logs/dev_app.log
@@ -40,6 +41,7 @@ logging:
     org.springframework.web: ERROR
     com.howtodoinjava: DEBUG
     org.hibernate: ERROR
+  config: src/main/resources/logback-spring.xml
 
 ---
 # Charset of HTTP requests and responses. Added to the "Content-Type" header if not set explicitly.
@@ -51,6 +53,15 @@ spring:
             enabled: true
 # Force the encoding to the configured charset on HTTP requests and responses.
             force: true
+---
+#email configuration
 
+spring:
+  mail:
+    host: smtp.mailtrap.io
+    port: 2525
+    username: b2592fe3eaad13
+    password: 0bf2ccb8316813
 
-
+server:
+  port: 8080

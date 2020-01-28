@@ -9,22 +9,14 @@ import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<UserEntity, Long> {
 
+    @Query(value = "SELECT u.id FROM UserEntity u WHERE u.login = ?1")
+    Long getIdUserByLogin(String login);
 
-    @Query(
-            value = "SELECT u.id FROM app_user u WHERE u.login = ?1",
-            nativeQuery = true)
-    Long getIdExistUserByLogin(String login);
+    @Query(value = "SELECT u.id FROM UserEntity u WHERE u.email = ?1")
+    Long getIdUserByEmail(String email);
 
-    @Query(
-            value = "SELECT u.id FROM app_user u WHERE u.email = ?1",
-            nativeQuery = true)
-    Long getIdExistUserByEmail(String email);
-
-    @Query(
-            value = "SELECT u.id FROM app_user u WHERE u.phone_number = ?1",
-            nativeQuery = true)
-    Long getIdExistUserByPhoneNumber(String phoneNumber);
-
+    @Query(value = "SELECT u.id FROM UserEntity u WHERE u.phoneNumber = ?1")
+    Long getIdUserByPhoneNumber(String phoneNumber);
 
     List<UserEntity> findAllByRoleEntity_Role(String role);
 
@@ -33,4 +25,6 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
     Optional<UserEntity> findById(Long id);
 
     UserEntity findByLogin(String login);
+
+
 }

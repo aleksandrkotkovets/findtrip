@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>Flight</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+    <link href="jquery.datetimepicker.min.css" rel="stylesheet">
+    <link  rel="stylesheet" type="text/css" th:href="@{/static/css/error.css}" >
+    <link  rel="stylesheet" type="text/css" th:href="@{/static/css/style.css}" >
+    <link  rel="stylesheet" type="text/css" th:href="@{/static/scrollup/css/scrollup.css}" >
+    <link  rel="stylesheet" type="text/css" th:href="@{/static/scrollup/css/filter.css}" >
+    <div th:replace="/home/adminHeader :: acss"></div>
+</head>
+<body>
+<div sec:authorize="hasRole('ROLE_ADMIN')">
+    <div th:replace="/home/adminHeader :: admin-header"/>
+</div>
+<div sec:authorize="hasRole('ROLE_WORKER')">
+  <div th:replace="/home/workerHeader :: worker-header"/>
+</div>
+
+<!--<div class="alert alert-success"   role="alert" id="alertCansFlightSuccessId" style="width: 400px;margin:5px 0 0 150vh;position: absolute"></div>
+-->
+<div id="container-2">
+
+    <div class="menu col-md-3" style="padding: 0px 0px" >
+        <div class="fancy-hover" id="home">
+          <a style="color: white;" th:href="@{/flights(status='ACTIVE')}"  th:text="#{text.status.active}"></a>
+        </div>
+        <div class="fancy-hover" id="top">
+          <a style="color: white;" th:href="@{/flights(status='FINISHED')}" th:text="#{text.status.finished}"></a>
+        </div>
+        <div class="fancy-hover" id="wait">
+          <a style="color: white;" th:href="@{/flights(status='CANCELED')}" th:text="#{text.status.canceled}"></a>
+        </div>
+    </div>
+
+    <div class="content col-md-8" style="padding-left: 0px" >
+    <div class="container " style="width: 800px; margin-top: -20px;">
+        <div class="card">
+            <div class="card-body">
+               <div th:switch="${flights}" class="container my-md-12">
+                    <p class="my-9" sec:authorize="hasRole('ROLE_WORKER')">
+                        <a th:href="@{/flights/create}" class="btn btn-primary">
+                            <i class="fas fa-plus ml-2" th:text="#{text.flights}"></i></a>
+                    </p>
+                   <p></p>
+
+
+                    <div class="col-md-12">
+                         <h2 th:case="null" th:text="#{text.record.found}"></h2>
+                        <div th:case="*">
+
+                          <div id="cardBorder" class="card border-success" style="margin-bottom: 15px" th:each="flight : ${flights}">
+                              <!-- Шапка (bg-primary - цвет фона, text-white - цвет текста) -->
+                              <div class="card-header bg-success text-white d-flex justify-content-between">
+                                    <span class="text-left" th:text="${flight.plane.companyDTO.name}"></span>
+                                    <span style="color: yellow;" th:text="${flight.status}"></span>
+                              </div>
+                              <!-- Текстовый контент -->
+                              <div class="card-body">
+                              <div class="d-flex justify-content-between" style="padding-bottom: 10px">
+                                   <div class="d-flex justify-content-start">
+                                     <div class="d-flex align-items-start flex-column">
+                                        <h1 th:text="${flight.timeDeparture}"></h1>
+                                        <span th:text="${flight.dateDeparture}"></span>
+                                        <span th:text="${flight.airportDeparture.cityDTO.name}" ></span>
+                                     </div>
+                                     <div class="d-flex align-items-start flex-column">
+                                        <img th:src="@{static/images/pl_up.png}" style="width: 70px;height: 70px; " alt="pl_ap">
+                                        <h6 style="color: #4a2bff" th:text="${flight.airportDeparture.code}"></h6>
+                                     </div>
+                                   </div>
+                                   <div class="d-flex align-items-center flex-column ">
+                                         <h6 th:text="#{text.on-way}"></h6>
+                                         <h6 th:text="${flight.travelTime}"></h6>
+                                         <h6 th:text="#{text.without-stop}"></h6>
+                                   </div>
+                                   <div class="d-flex justify-content-start ">
+                                        <div class="d-flex align-items-end flex-column">
+                                          <img th:src="@{static/images/pl_down.png}" style="width: 70px;height: 70px; " alt="pl_ap">
+                                          <h6 style="color: #4a2bff" th:text="${flight.airportArrival.code}"></h6>
+                                       </div>
+                                      <div class="d-flex align-items-end flex-column">
+                                         <h1 th:text="${flight.timeArrival}"></h1>
+                                         <span th:text="${flight.dateArrival}"></span>
+                                         <span th:text="${flight.airportArrival.cityDTO.name}"></span>
+                                      </div>
+
+                                    </div>
+                              </div>
+                                  <input type="hidden" class="idFlight" th:value="${flight.id}" id="idFlight">
+                                  <h6 class="card-text" th:text="#{text.seat-price}+': '+${flight.price}"></h6>
+                                  <h6 class="card-text" th:text="#{text.free-seats}+': '+${flight.freeSeats}"></h6>
+                                  <h6 class="card-text" th:text="#{text.all-seats}+': '+${flight.allSeats}"></h6>
+                                  <h6 class="card-text" th:text="#{text.number-tickets-sold}+': '+${flight.soldTickets}"></h6>
+
+                              </div>
+                              <div class="card-footer d-flex flex-row bd-highlight " >
+                                <a th:if="${flight.status.toString() == 'ACTIVE' }" th:href="@{/flights/edit/{id} (id=${flight.id}) }"
+                                 class="btn btn-primary" th:text="#{text.edit}" ></a>
+
+                                 <a
+                                  th:unless="${flight.soldTickets == 0}"
+                                  th:href="@{flights/{id}/orders(id=${flight.id})}"  class="btn btn-info" style="margin-left: 10px"
+                                  th:text="#{text.number-tickets-sold}"></a>
+
+                                 <form  th:action="@{/flights/canceled/{id}(id=${flight.id})}" method="get">
+                                 <button
+                                  th:if="${#authorization.expression('hasRole(''ROLE_WORKER'')')}"
+                                  th:unless="${flight.status.toString() != 'ACTIVE' }" type="submit" id="canceledId" class="btn btn-danger" style="margin-left: 10px" th:text="#{text.cancel}"></button>
+                                 </form>
+                              </div>
+                          </div>
+
+                        </div>
+
+                    </div>
+                 </div>
+           </div>
+        </div>
+    </div>
+    </div>
+</div>
+
+<div id="container-3">
+
+    <div class="footer">
+
+    </div>
+</div>
+<a href="#" class="scrollup">Наверх</a>
+
+<script type="text/javascript" th:src="@{/static/scrollup/js/scroll.js}" src="../static/j/main.js"></script>
+<script type="text/javascript" th:src="@{/static/scrollup/js/jquery-3.2.1.min.js}" src="../static/j/jquery-3.2.1.min.js" ></script>
+</body>
+</html>
